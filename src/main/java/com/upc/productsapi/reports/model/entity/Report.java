@@ -20,7 +20,6 @@ public class Report {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "report_id")
     private Long reportId;
 
     @Column(nullable = false)
@@ -44,8 +43,8 @@ public class Report {
     @Column(nullable = false)
     private LocalTime reportTime = LocalTime.now(); // Inicializa con la hora actual
 
-    @ElementCollection
-    private List<String> imagesBase64;
+    @Column(nullable = false)
+    private String imagesBase64;
 
     @Enumerated(EnumType.STRING)
     public Type getTypeEnum() {
