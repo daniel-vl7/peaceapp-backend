@@ -1,6 +1,7 @@
 package com.upc.productsapi.reports.service;
 
 
+import com.upc.productsapi.reports.model.dto.enums.Type;
 import com.upc.productsapi.reports.model.dto.request.ReportRequestDto;
 import com.upc.productsapi.reports.model.dto.response.ReportResponseDto;
 import com.upc.productsapi.reports.model.entity.Report;
@@ -17,6 +18,8 @@ import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 import org.modelmapper.ModelMapper;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -48,18 +51,40 @@ public class ReportServiceTest {
 
     @Test
     public void testRegisterReport() {
-        // Arrange: Configuramos los datos y los comportamientos esperados
+        // Arrange: Configuramos los datos de entrada
         ReportRequestDto requestDto = new ReportRequestDto();
-        requestDto.setTitle("New Report");
+        requestDto.setTitle("Test Report");
+        requestDto.setDescription("This is a test report");
+        requestDto.setDistrict("Downtown");
+        requestDto.setType(1); // Correspondiente a ROBBERY
 
+        // Creamos la entidad Report con todos sus campos
         Report report = new Report();
-        report.setId(1L);
+        report.setReportId(1L);
+        report.setTitle("Test Report");
+        report.setDescription("This is a test report");
+        report.setDistrict("Downtown");
+        report.setType(1);
+        report.setViews(0); // Valor inicial por defecto
+        report.setReportDate(LocalDate.now()); // Fecha actual por defecto
+        report.setReportTime(LocalTime.now()); // Hora actual por defecto
+
 
         when(modelMapper.map(requestDto, Report.class)).thenReturn(report);
         when(reportRepository.save(report)).thenReturn(report);
 
+        // Configuramos la respuesta del mapeo hacia ReportResponseDto
         ReportResponseDto responseDto = new ReportResponseDto();
         responseDto.setId(1L);
+        responseDto.setTitle("Test Report");
+        responseDto.setDescription("This is a test report");
+        responseDto.setDistrict("Downtown");
+        responseDto.setType(Type.ROBBERY);
+        responseDto.setViews(0);
+        responseDto.setReportDate(report.getReportDate());
+        responseDto.setReportTime(report.getReportTime());
+        responseDto.setImagesBase64("asdfasdfasd");
+
         when(modelMapper.map(report, ReportResponseDto.class)).thenReturn(responseDto);
 
         // Act: Llamamos al método que vamos a probar
@@ -69,8 +94,19 @@ public class ReportServiceTest {
         assertEquals(EStatus.SUCCESS, response.getStatus());
         assertEquals("Calle registrada correctamente", response.getMessage());
         assertNotNull(response.getData());
-        assertEquals(1L, response.getData().getId());
 
+        ReportResponseDto responseData = response.getData();
+        assertEquals(1L, responseData.getId());
+        assertEquals("Test Report", responseData.getTitle());
+        assertEquals("This is a test report", responseData.getDescription());
+        assertEquals("Downtown", responseData.getDistrict());
+        assertEquals(Type.ROBBERY, responseData.getType());
+        assertEquals(0, responseData.getViews());
+        assertEquals(report.getReportDate(), responseData.getReportDate());
+        assertEquals(report.getReportTime(), responseData.getReportTime());
+        assertEquals("asdfasdfasd", responseData.getImagesBase64());
+
+        // Verificar que se haya llamado al método save del repositorio exactamente una vez
         verify(reportRepository, times(1)).save(report);
     }
 

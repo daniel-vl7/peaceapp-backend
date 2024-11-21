@@ -26,7 +26,7 @@ public class ReportResponseDto {
     private String title;
     private LocalDate reportDate;
     private LocalTime reportTime;
-    private List<String> imagesBase64;
+    private String imagesBase64;
 
     public void setId(long l) {
         this.reportId = l;

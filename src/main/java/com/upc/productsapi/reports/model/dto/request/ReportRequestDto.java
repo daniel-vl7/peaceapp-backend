@@ -31,6 +31,8 @@ public class ReportRequestDto {
     @NotBlank(message = "El distrito de la denuncia no puede estar vacía")
     private String district;
 
+    @NotBlank(message = "El distrito de la denuncia no puede estar vacía")
+    private String imagesBase64;
 
 
 }
